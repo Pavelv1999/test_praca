@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praca — зачёт по лексике</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFAF5;
+  --grid:#E3E6D8;
+  --ink:#1F2A22;
+  --ink-soft:#5E6657;
+  --olive:#4D6B2A;
+  --olive-l:#EAF0DF;
+  --ochre:#C98A1B;
+  --red:#B83A2B;
+  --line:#CBD0BF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#EEF0E6}
+body{
+  font-family:"PT Serif",Georgia,serif;color:var(--ink);font-size:18px;line-height:1.5;
+  background:#EEF0E6;min-height:100vh;padding:0 16px 60px;
+  -webkit-user-select:none;user-select:none;
+}
+textarea,input{-webkit-user-select:text;user-select:text}
+.sheet{
+  max-width:760px;margin:0 auto;background:var(--paper);min-height:100vh;
+  padding:0 40px 48px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;background-position:-1px -1px;
+  box-shadow:0 0 0 1px #DADDCF;
+}
+.hidden{display:none!important}
+.teacher{
+  font-family:"PT Sans",Arial,sans-serif;font-size:13px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-soft);text-align:right;
+  padding:14px 0 12px;border-bottom:1px solid var(--line);margin:0 0 6px;
+}
+h1{font-family:"PT Sans",Arial,sans-serif;font-weight:700;font-size:40px;line-height:1.1;margin:28px 0 6px;color:var(--olive)}
+.sub{font-family:"PT Sans",Arial,sans-serif;color:var(--ink-soft);font-size:16px;margin-bottom:24px}
+h2{font-family:"PT Sans",Arial,sans-serif;font-size:20px;margin:26px 0 10px}
+p{margin:0 0 12px}
+label{display:block;font-family:"PT Sans",Arial,sans-serif;font-weight:700;font-size:15px;margin:16px 0 6px}
+input[type=text]{
+  width:100%;font:inherit;font-size:18px;padding:10px 12px;border:1.5px solid var(--line);
+  border-radius:6px;background:#fff;color:var(--ink);
+}
+input[type=text]:focus,textarea:focus{outline:3px solid #C9D7AE;border-color:var(--olive)}
+.rules{background:#fff;border:1.5px solid var(--line);border-left:6px solid var(--olive);border-radius:6px;padding:14px 18px;margin:18px 0}
+.rules li{margin:0 0 6px 18px}
+.prep{background:#FBF0DA;border-left:6px solid var(--ochre);border-radius:6px;padding:12px 18px;margin:18px 0}
+.btn{
+  font-family:"PT Sans",Arial,sans-serif;font-weight:700;font-size:18px;cursor:pointer;
+  background:var(--olive);color:#fff;border:0;border-radius:8px;padding:14px 26px;margin-top:10px;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:default}
+.warn{color:var(--red);font-family:"PT Sans",Arial,sans-serif;font-size:15px;margin-top:10px}
+.err{color:var(--red);font-family:"PT Sans",Arial,sans-serif;font-size:15px;min-height:20px;margin-top:6px}
+
+/* timer bar */
+.bar{position:sticky;top:0;z-index:5;display:none;background:var(--paper);padding:12px 0 8px;border-bottom:1px solid var(--line)}
+.bar.on{display:block}
+.barrow{display:flex;justify-content:space-between;align-items:baseline;font-family:"PT Sans",Arial,sans-serif}
+.part{font-size:14px;color:var(--ink-soft);letter-spacing:.04em;text-transform:uppercase}
+.clock{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--olive)}
+.clock.low{color:var(--red)}
+.meter{height:6px;background:#E2E5D8;border-radius:3px;margin-top:6px;overflow:hidden}
+.meter div{height:100%;background:var(--olive);width:100%;transition:width 1s linear}
+.meter div.low{background:var(--red)}
+.track{display:none;gap:4px;flex-wrap:wrap;margin:12px 0 0}
+.track.on{display:flex}
+.track span{width:14px;height:6px;border-radius:3px;background:#D8DCCB}
+.track span.done{background:var(--olive)}
+.track span.cur{background:var(--ochre)}
+
+.qnum{font-family:"PT Sans",Arial,sans-serif;font-size:14px;color:var(--ink-soft);margin:22px 0 6px}
+.q{font-size:22px;line-height:1.45;margin-bottom:18px}
+.q b{color:var(--olive)}
+.opts{display:grid;gap:10px}
+.opt{
+  font:inherit;font-size:19px;text-align:left;cursor:pointer;background:#fff;color:var(--ink);
+  border:1.5px solid var(--line);border-radius:8px;padding:12px 16px;
+}
+.opt:hover{border-color:var(--olive)}
+.opt.sel{border-color:var(--olive);background:var(--olive-l);box-shadow:inset 4px 0 0 var(--olive)}
+.opt .k{font-family:"PT Sans",Arial,sans-serif;font-weight:700;color:var(--ink-soft);margin-right:10px}
+textarea{
+  width:100%;min-height:190px;font:inherit;font-size:19px;line-height:1.5;padding:12px 14px;
+  border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);resize:vertical;
+}
+.pic{display:block;max-width:100%;max-height:52vh;margin:0 auto 12px;border-radius:8px;border:1.5px solid var(--line)}
+.hint{font-family:"PT Sans",Arial,sans-serif;font-size:14px;color:var(--ink-soft);margin-top:12px}
+.donebox{margin-top:60px;text-align:center}
+.donebox h2{font-size:30px;color:var(--olive)}
+.fallback{margin-top:24px;text-align:left}
+.fallback textarea{min-height:120px;font-family:monospace;font-size:13px}
+.fallback .btn{margin-right:8px}
+@media (max-width:560px){
+  .sheet{padding:0 18px 40px}
+  h1{font-size:32px}
+  .q{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="teacher">Преподаватель Веренич Павел</div>
+
+  <div class="bar" id="bar">
+    <div class="barrow"><span class="part" id="partLbl">Часть 1</span><span class="clock" id="clock">0:20</span></div>
+    <div class="meter"><div id="meter"></div></div>
+    <div class="track" id="track"></div>
+  </div>
+
+  <!-- START -->
+  <section id="screen-start">
+    <h1>Praca</h1>
+    <div class="sub">Зачёт по лексике · Hurra 2, Lekcja 3 · профессии, условия работы, поиск работы, черты характера</div>
+
+    <label for="name">Имя и фамилия</label>
+    <input type="text" id="name" autocomplete="off" placeholder="np. Anna Kowalska">
+    <label for="clockIn">Который час сейчас на твоих часах?</label>
+    <input type="text" id="clockIn" autocomplete="off" placeholder="np. 18:05">
+
+    <div class="rules">
+      <p><b>Как устроен зачёт</b></p>
+      <ul>
+        <li><b>Часть 1</b> — 14 вопросов с выбором ответа, на каждый 20 секунд (на два последних — 30).</li>
+        <li><b>Часть 2</b> — 7 заданий, где нужно написать ответ по-польски: 90–150 секунд на каждое.</li>
+        <li><b>Часть 3</b> — описание картинки, 3 минуты.</li>
+        <li>Всего около <b>20 минут</b>. Когда время задания кончается, ответ сохраняется сам и открывается следующее.</li>
+        <li>Вернуться к прошлому заданию нельзя. Нажимай «Дальше», когда готова.</li>
+        <li>Буквы ą, ę, ł, ó, ś, ż можно писать без хвостиков — это не ошибка. Важно, чтобы было правильное слово в правильной форме.</li>
+        <li>Копировать и вставлять текст нельзя. Уход со страницы (другая вкладка, переводчик, чат) фиксируется и попадает учителю в отчёт.</li>
+        <li>Попытка одна: каждый запуск получает свой код и отдельное письмо учителю.</li>
+      </ul>
+    </div>
+
+    <div class="prep">Перед началом закрой другие вкладки и выключи уведомления. Словарик не нужен — проверяем, что ты помнишь.</div>
+
+    <button class="btn" id="startBtn">Начать зачёт</button>
+    <div class="err" id="startErr"></div>
+    <div class="warn">Таймер пойдёт сразу после нажатия.</div>
+  </section>
+
+  <!-- TEST -->
+  <section id="screen-test" class="hidden">
+    <div class="qnum" id="qnum"></div>
+    <div id="qbox"></div>
+    <button class="btn" id="nextBtn">Дальше</button>
+    <div class="hint" id="qhint">Вернуться к заданию нельзя.</div>
+  </section>
+
+  <!-- DONE -->
+  <section id="screen-done" class="hidden">
+    <div class="donebox">
+      <h2 id="doneTitle">Отправляем работу…</h2>
+      <p id="doneText"></p>
+    </div>
+    <div class="fallback hidden" id="fallback">
+      <p>Скопируй этот текст целиком и отправь учителю (читать его не нужно):</p>
+      <textarea id="fallbackText" readonly></textarea>
+      <button class="btn" id="copyBtn">Скопировать</button>
+      <button class="btn" id="mailBtn">Открыть письмо</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ================== НАСТРОЙКИ ================== */
+const CONFIG = {
+  EMAIL: "pasha_viarenich@mail.ru",   // почта учителя (FormSubmit)
+  TOPIC: "Praca (słownictwo)",
+  SEC_CLOSED: 20,                // секунд на вопрос с выбором ответа
+  SEC_CLOSED_LAST: 30,           // секунд на два последних вопроса с выбором (они сложнее)
+  SEC_OPEN: 90,                  // секунд на развёрнутый ответ (у некоторых заданий больше — см. sec ниже)
+  SEC_IMAGE: 180,                // секунд на описание картинки
+  BLOCK_COPY: true
+};
+
+/* Часть 1: a — номер правильного варианта (с нуля). Ученица ответы не видит. */
+const CLOSED = [
+  { q:"Człowiek, który nie ma pracy, to…", o:["pracodawca","bezrobotny","emeryt","stażysta"], a:1 },
+  { q:"Pieniądze, które co miesiąc dostajesz za swoją pracę, to…", o:["premia","zasiłek","pensja","podatek"], a:2 },
+  { q:"Ewa pracuje tylko cztery godziny dziennie. Pracuje na…", o:["pełen etat","pół etatu","własny rachunek","emeryturze"], a:1 },
+  { q:"Który wyraz znaczy prawie to samo co <b>wynagrodzenie</b>?", o:["urlop","umowa","zarobki","etat"], a:2 },
+  { q:"Mateusz nie ma szefa ani etatu. Pracuje na własny…", o:["rachunek","koszt","kontrakt","czas"], a:0 },
+  { q:"Dyrektor szuka pracownika i chce ___ nową osobę.", o:["zwolnić","zatrudnić","zarobić","zrezygnować"], a:1 },
+  { q:"Od stycznia zarabiam o 500 złotych więcej, bo dostałam…", o:["podwyżkę","urlop","wypowiedzenie","nadgodziny"], a:0 },
+  { q:"Dokument, w którym opisujesz swoje wykształcenie i doświadczenie, to…", o:["umowa","ogłoszenie","CV","świadectwo"], a:2 },
+  { q:"Spotkanie kandydata z pracodawcą przed zatrudnieniem to…", o:["wywiad","rozmowa kwalifikacyjna","zebranie","narada"], a:1 },
+  { q:"Który wyraz <b>nie pasuje</b> do pozostałych?", o:["lekarz","pielęgniarka","pediatra","księgowy"], a:3 },
+  { q:"Osoba, która zawsze przychodzi do pracy na czas, jest…", o:["dokładna","cierpliwa","punktualna","uczciwa"], a:2 },
+  { q:"<b>Pracowity</b> to przeciwieństwo słowa…", o:["leniwy","zmęczony","nudny","spokojny"], a:0 },
+  { q:"Wszyscy ___ w naszej firmie są bardzo kompetentni.", o:["informatyki","informatycy","informatyków","informatykowie"], a:1 },
+  { q:"Firma ma problemy finansowe i musi ___ dziesięciu pracowników. Ci ludzie będą ___.", o:["zatrudnić … zadowoleni","zwolnić … bezrobotni","zwolnić … bezrobotne","zrezygnować … bezrobotni"], a:1 },
+];
+
+/* Часть 2: klucz уходит только учителю. sec — своё время, если не стандартное. */
+const OPEN = [
+  { q:"Wyjaśnij po polsku, kim jest: <b>a) stażysta</b>, <b>b) przedsiębiorca</b>. Jedno zdanie o każdym.",
+    klucz:"a) osoba, która uczy się zawodu w firmie / zdobywa pierwsze doświadczenie, zwykle mało zarabia; b) osoba, która ma własną firmę / pracuje na własny rachunek." },
+  { q:"Dokończ zdania:<br>a) Praca nauczyciela jest ciekawa, ale…<br>b) Praca na etacie daje stałe zarobki, ale…",
+    klucz:"np. a) …nauczyciele zarabiają mało / trzeba pracować wieczorami w domu; b) …nie daje wolności / trzeba pracować w stałych godzinach / trudno dostać podwyżkę." },
+  { q:"Napisz <b>3 plusy</b> i <b>2 minusy</b> pracy zdalnej (z domu).",
+    klucz:"plusy: nie trzeba dojeżdżać, oszczędność czasu i pieniędzy, elastyczne godziny, spokój; minusy: brak kontaktu z ludźmi, trudno oddzielić pracę od domu, dzień pracy się „rozmywa”, rodzina przeszkadza." },
+  { q:"Ułóż trzy zdania z wyrażeniami: <b>wysłać CV</b>, <b>podpisać umowę</b>, <b>dostać awans</b>.",
+    klucz:"Sprawdź formy: wysłałam CV do… · podpisałam umowę o pracę · dostała awans na kierownika / kierowniczkę." },
+  { q:"Zamień na liczbę mnogą:<br>a) Każdy dobry lekarz jest cierpliwy i odpowiedzialny.<br>b) Każdy kierowca pracuje długo.",
+    klucz:"a) Wszyscy dobrzy lekarze są cierpliwi i odpowiedzialni. b) Wszyscy kierowcy pracują długo." },
+  { q:"Rozmowa kwalifikacyjna. Szef pyta: <b>„Jakie są Pani mocne i słabe strony?”</b> Odpowiedz w 3–4 zdaniach.", sec:120,
+    klucz:"Oczekiwane: Moją mocną stroną jest… / Jestem punktualna, odpowiedzialna, komunikatywna… / Mam doświadczenie w… / Moją słabą stroną jest… Oceń cechy z lekcji 1 i 3." },
+  { q:"Opisz swoją wymarzoną pracę: kim jesteś, gdzie pracujesz, ile zarabiasz, jakie masz obowiązki i dlaczego ta praca daje ci satysfakcję (4–5 zdań).", sec:150,
+    klucz:"Oceń słownictwo: zawód, miejsce (w biurze, w szpitalu…), etat / własny rachunek, pensja / zarobki, obowiązki, satysfakcja." },
+];
+
+/* Часть 3: картинка. Положите файл рядом с этим html. Если файла нет — задание пропускается само. */
+const IMAGES = [
+  { file:"praca.png",
+    q:"Wybierz <b>trzy osoby</b> z obrazka. O każdej napisz: kim jest z zawodu, gdzie pracuje, co robi i jaka jest jej praca (ciekawa, stresująca, męcząca…).",
+    klucz:"1 lekarka / pediatra — w gabinecie, bada dziecko · 2 informatyk / programista — w domu, pracuje zdalnie · 3 kelner — w restauracji, podaje jedzenie, obsługuje gości · 4 taksówkarz / kierowca — wozi klientów · 5 nauczycielka — w szkole, prowadzi lekcję · 6 fryzjerka — w salonie, strzyże klientkę." },
+];
+/* ================================================ */
+
+const $ = id => document.getElementById(id);
+const CODE = Math.random().toString(36).slice(2, 6).toUpperCase();
+const ITEMS = [];
+CLOSED.forEach((c, i) => ITEMS.push({ type:"closed", q:c.q, o:c.o, a:c.a, part:"Часть 1 · выбор ответа",
+  sec: (i >= CLOSED.length - 2) ? CONFIG.SEC_CLOSED_LAST : CONFIG.SEC_CLOSED }));
+OPEN.forEach(c => ITEMS.push({ type:"open", q:c.q, klucz:c.klucz, part:"Часть 2 · напиши ответ", sec:c.sec || CONFIG.SEC_OPEN }));
+IMAGES.forEach(c => ITEMS.push({ type:"image", q:c.q, file:c.file, klucz:c.klucz, part:"Часть 3 · картинка", sec:CONFIG.SEC_IMAGE }));
+
+let idx = -1, left = 0, timerId = null, running = false, chosen = null;
+let name = "", clockIn = "", startedAt = null;
+let leaves = 0, lastLeave = 0;
+const imgOk = {};
+
+/* preload images; missing ones are skipped */
+IMAGES.forEach(im => { const t = new Image(); t.onload = () => imgOk[im.file] = true; t.onerror = () => imgOk[im.file] = false; t.src = im.file; });
+
+function strip(h){ const d = document.createElement("div"); d.innerHTML = h.replace(/<br>/g, " / "); return d.textContent; }
+function fmt(s){ return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function now(){ return new Date().toLocaleString("ru-RU"); }
+
+async function send(subject, fields){
+  try{
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch("https://formsubmit.co/ajax/" + CONFIG.EMAIL, {
+      method:"POST", signal:ctrl.signal,
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(Object.assign({ _subject:subject, _template:"box", _captcha:"false" }, fields))
+    });
+    clearTimeout(t);
+    const j = await r.json().catch(() => ({}));
+    return r.ok && String(j.success) !== "false";
+  }catch(e){ return false; }
+}
+
+/* leaving the page */
+function leave(){
+  if(!running) return;
+  const t = Date.now(); if(t - lastLeave < 1500) return; lastLeave = t;
+  leaves++; if(ITEMS[idx]) ITEMS[idx].left = (ITEMS[idx].left || 0) + 1;
+}
+document.addEventListener("visibilitychange", () => { if(document.hidden) leave(); });
+window.addEventListener("blur", leave);
+
+/* copy / paste blocking */
+if(CONFIG.BLOCK_COPY){
+  ["copy","cut","paste","contextmenu","drop"].forEach(ev => document.addEventListener(ev, e => {
+    if(!running && ev !== "contextmenu") return;
+    e.preventDefault();
+    if(running && ev === "paste" && ITEMS[idx]) ITEMS[idx].paste = (ITEMS[idx].paste || 0) + 1;
+  }));
+}
+
+$("startBtn").onclick = () => {
+  name = $("name").value.trim(); clockIn = $("clockIn").value.trim();
+  if(name.length < 2){ $("startErr").textContent = "Впиши имя и фамилию."; return; }
+  if(!clockIn){ $("startErr").textContent = "Впиши, который сейчас час."; return; }
+  startedAt = now();
+  send("СТАРТ · " + CONFIG.TOPIC + " · " + name + " · код " + CODE,
+       { Ученик:name, Тема:CONFIG.TOPIC, Код_работы:CODE, Время_по_часам_ученицы:clockIn, Старт_по_устройству:startedAt });
+  $("screen-start").classList.add("hidden");
+  $("screen-test").classList.remove("hidden");
+  $("bar").classList.add("on"); $("track").classList.add("on");
+  $("track").innerHTML = ITEMS.map(() => "<span></span>").join("");
+  running = true;
+  next();
+};
+
+function save(){
+  const it = ITEMS[idx]; if(!it || it.saved) return;
+  it.used = it.sec - left;
+  if(it.type === "closed") it.ans = chosen;
+  else{ const ta = $("ans"); it.ans = ta ? ta.value.trim() : ""; }
+  it.saved = true;
+}
+
+function next(){
+  if(idx >= 0){ save(); }
+  clearInterval(timerId);
+  idx++;
+  while(idx < ITEMS.length && ITEMS[idx].type === "image" && imgOk[ITEMS[idx].file] !== true){
+    ITEMS[idx].skipped = true; ITEMS[idx].saved = true; idx++;
+  }
+  if(idx >= ITEMS.length){ finish(); return; }
+  show();
+}
+
+function show(){
+  const it = ITEMS[idx]; chosen = null;
+  const spans = $("track").children;
+  for(let i = 0; i < spans.length; i++) spans[i].className = i < idx ? "done" : (i === idx ? "cur" : "");
+  $("partLbl").textContent = it.part;
+  $("qnum").textContent = "Задание " + (idx + 1) + " из " + ITEMS.length;
+  let h = "";
+  if(it.type === "image") h += '<img class="pic" src="' + it.file + '" alt="">';
+  h += '<div class="q">' + it.q + '</div>';
+  if(it.type === "closed"){
+    h += '<div class="opts">' + it.o.map((o, i) =>
+      '<button class="opt" data-i="' + i + '"><span class="k">' + "abcd"[i] + ')</span>' + o + '</button>').join("") + '</div>';
+  }else{
+    h += '<textarea id="ans" spellcheck="false" autocomplete="off" placeholder="Pisz tutaj…"></textarea>';
+  }
+  $("qbox").innerHTML = h;
+  $("qhint").textContent = it.type === "closed" ? "Выбери ответ и нажми «Дальше». Вернуться к заданию нельзя." : "Пиши по-польски. Вернуться к заданию нельзя.";
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".opt").forEach(x => x.classList.remove("sel"));
+    b.classList.add("sel"); chosen = +b.dataset.i;
+  });
+  if($("ans")) $("ans").focus();
+  window.scrollTo(0, 0);
+  left = it.sec; tick();
+  timerId = setInterval(() => { left--; tick(); if(left <= 0){ next(); } }, 1000);
+}
+
+function tick(){
+  const it = ITEMS[idx]; const low = left <= 5;
+  $("clock").textContent = fmt(Math.max(0, left));
+  $("clock").classList.toggle("low", low);
+  $("meter").style.width = (100 * Math.max(0, left) / it.sec) + "%";
+  $("meter").classList.toggle("low", low);
+}
+
+$("nextBtn").onclick = () => { if(running) next(); };
+
+function report(){
+  let score = 0; const n = CLOSED.length;
+  const L = [];
+  L.push("Ученик: " + name);
+  L.push("Тема: " + CONFIG.TOPIC + " · код " + CODE);
+  L.push("Время по часам ученицы на старте: " + clockIn);
+  L.push("Старт по устройству: " + startedAt + " · конец: " + now());
+  L.push("Уходов со страницы: " + leaves);
+  const closed = ITEMS.filter(i => i.type === "closed");
+  closed.forEach(i => { if(i.ans === i.a) score++; });
+  L.push("ЧАСТЬ 1: " + score + "/" + n + " (" + Math.round(100 * score / n) + "%)");
+  L.push("");
+  L.push("===== ЧАСТЬ 1 · выбор ответа =====");
+  closed.forEach((it, k) => {
+    const ok = it.ans === it.a;
+    L.push((k + 1) + ". " + strip(it.q));
+    L.push("   выбрала: " + (it.ans === null || it.ans === undefined ? "— нет ответа" : it.o[it.ans]) + " · верно: " + it.o[it.a] + " · " + (ok ? "✔ верно" : "✘ ошибка"));
+    L.push("   [потрачено " + it.used + " с из " + it.sec + "]" + (it.left ? " · уходила со страницы: " + it.left : "") + (it.paste ? " · пыталась вставить текст" : ""));
+  });
+  L.push("");
+  L.push("===== ЧАСТЬ 2 · развёрнутые ответы =====");
+  ITEMS.filter(i => i.type === "open").forEach((it, k) => {
+    L.push((k + 1) + ". " + strip(it.q));
+    L.push("   [потрачено " + it.used + " с из " + it.sec + "]" + (it.left ? " · уходила со страницы: " + it.left : "") + (it.paste ? " · пыталась вставить текст" : ""));
+    L.push("   ОТВЕТ: " + (it.ans ? it.ans : "— нет ответа"));
+    L.push("   ключ: " + it.klucz);
+  });
+  L.push("");
+  L.push("===== ЧАСТЬ 3 · картинка =====");
+  ITEMS.filter(i => i.type === "image").forEach(it => {
+    if(it.skipped){ L.push("Картинка " + it.file + " не загрузилась — задание пропущено."); return; }
+    L.push(strip(it.q));
+    L.push("   [потрачено " + it.used + " с из " + it.sec + "]" + (it.left ? " · уходила со страницы: " + it.left : ""));
+    L.push("   ОТВЕТ: " + (it.ans ? it.ans : "— нет ответа"));
+    L.push("   ключ: " + it.klucz);
+  });
+  return { score, total:n, text:L.join("\n") };
+}
+
+async function finish(){
+  running = false;
+  clearInterval(timerId);
+  const r = report();
+  $("screen-test").classList.add("hidden");
+  $("bar").classList.remove("on");
+  $("track").classList.remove("on");
+  $("screen-done").classList.remove("hidden");
+  $("doneTitle").textContent = "Отправляем работу…";
+  $("doneText").textContent = "Задания закончились.";
+  window.scrollTo(0, 0);
+
+  const sent = await send(
+    "РАБОТА · " + CONFIG.TOPIC + " · " + name + " · код " + CODE + " · " + r.score + "/" + r.total + " в части 1",
+    { Ученик:name, Тема:CONFIG.TOPIC, Код_работы:CODE, Время_по_часам_ученицы:clockIn, Работа:r.text }
+  );
+
+  if(sent){
+    $("doneTitle").textContent = "Работа отправлена";
+    $("doneText").textContent = "Отчёт ушёл учителю, код работы " + CODE + ". Страницу можно закрыть.";
+  }else{
+    const enc = "PRACA-" + CODE + "\n" + btoa(unescape(encodeURIComponent(r.text)));
+    $("doneTitle").textContent = "Работа закрыта";
+    $("doneText").textContent = "Отправить письмо не удалось — сделай это вручную.";
+    $("fallback").classList.remove("hidden");
+    $("fallbackText").value = enc;
+    $("copyBtn").onclick = async () => {
+      try{ await navigator.clipboard.writeText(enc); $("copyBtn").textContent = "Скопировано"; }
+      catch(e){ $("fallbackText").select(); }
+    };
+    $("mailBtn").onclick = () => {
+      location.href = "mailto:" + CONFIG.EMAIL +
+        "?subject=" + encodeURIComponent("Zaliczenie: praca — " + name) +
+        "&body=" + encodeURIComponent(enc);
+    };
+  }
+}
+</script>
+</body>
+</html>
